@@ -900,6 +900,9 @@ var OperatorConfigCRDResourceValidation = apiextv1beta1.CustomResourceValidation
 							"wal_s3_bucket": {
 								Type: "string",
 							},
+							"wal_gs_bucket": {
+								Type: "string",
+							},
 						},
 					},
 					"logical_backup": {

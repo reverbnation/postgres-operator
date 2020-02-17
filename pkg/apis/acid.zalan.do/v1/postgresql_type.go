@@ -131,6 +131,7 @@ type CloneDescription struct {
 	ClusterName       string `json:"cluster,omitempty"`
 	UID               string `json:"uid,omitempty"`
 	EndTimestamp      string `json:"timestamp,omitempty"`
+	GSWalPath         string `json:"gs_wal_path,omitempty"`
 	S3WalPath         string `json:"s3_wal_path,omitempty"`
 	S3Endpoint        string `json:"s3_endpoint,omitempty"`
 	S3AccessKeyId     string `json:"s3_access_key_id,omitempty"`

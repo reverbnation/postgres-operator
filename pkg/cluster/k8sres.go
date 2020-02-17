@@ -590,6 +590,11 @@ func (c *Cluster) generateSpiloPodEnvVars(uid types.UID, spiloConfiguration stri
 		envVars = append(envVars, v1.EnvVar{Name: "WAL_BUCKET_SCOPE_SUFFIX", Value: getBucketScopeSuffix(string(uid))})
 		envVars = append(envVars, v1.EnvVar{Name: "WAL_BUCKET_SCOPE_PREFIX", Value: ""})
 	}
+	if c.OpConfig.WALEGSBucket != "" {
+		envVars = append(envVars, v1.EnvVar{Name: "WAL_GS_BUCKET", Value: c.OpConfig.WALEGSBucket})
+		envVars = append(envVars, v1.EnvVar{Name: "WAL_BUCKET_SCOPE_SUFFIX", Value: getBucketScopeSuffix(string(uid))})
+		envVars = append(envVars, v1.EnvVar{Name: "WAL_BUCKET_SCOPE_PREFIX", Value: ""})
+	}
 
 	if c.OpConfig.LogS3Bucket != "" {
 		envVars = append(envVars, v1.EnvVar{Name: "LOG_S3_BUCKET", Value: c.OpConfig.LogS3Bucket})
@@ -1352,6 +1357,42 @@ func (c *Cluster) generateCloneEnvironment(description *acidv1.CloneDescription)
 					},
 				},
 			})
+	} else if c.OpConfig.WALEGSBucket != "" {
+		// cloning with GS, find out the bucket to clone
+		msg := "Clone from GS bucket"
+		c.logger.Info(msg, description.GSWalPath)
+
+		if description.GSWalPath == "" {
+			msg := "Figure out which GS bucket to use from env"
+			c.logger.Info(msg, description.GSWalPath)
+
+			envs := []v1.EnvVar{
+				v1.EnvVar{
+					Name:  "CLONE_WAL_GS_BUCKET",
+					Value: c.OpConfig.WALEGSBucket,
+				},
+				v1.EnvVar{
+					Name:  "CLONE_WAL_BUCKET_SCOPE_SUFFIX",
+					Value: getBucketScopeSuffix(description.UID),
+				},
+			}
+
+			result = append(result, envs...)
+		} else {
+			msg := "Use custom parsed GSWalPath %s from the manifest"
+			c.logger.Warningf(msg, description.GSWalPath)
+
+			result = append(result, v1.EnvVar{
+				Name:  "CLONE_WALE_GS_PREFIX",
+				Value: description.GSWalPath,
+			})
+		}
+
+		result = append(result, v1.EnvVar{Name: "CLONE_METHOD", Value: "CLONE_WITH_WALE"})
+		result = append(result, v1.EnvVar{Name: "CLONE_USE_WALG", Value: "true"})
+		result = append(result, v1.EnvVar{Name: "CLONE_TARGET_TIME", Value: description.EndTimestamp})
+		result = append(result, v1.EnvVar{Name: "CLONE_WAL_BUCKET_SCOPE_PREFIX", Value: ""})
+
 	} else {
 		// cloning with S3, find out the bucket to clone
 		msg := "Clone from S3 bucket"

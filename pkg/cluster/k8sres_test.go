@@ -309,6 +309,7 @@ func TestCloneEnv(t *testing.T) {
 		subTest   string
 		cloneOpts *acidv1.CloneDescription
 		env       v1.EnvVar
+		opConfig  config.Config
 		envPos    int
 	}{
 		{
@@ -322,6 +323,7 @@ func TestCloneEnv(t *testing.T) {
 				Name:  "CLONE_WALE_S3_PREFIX",
 				Value: "s3://some/path/",
 			},
+			opConfig: config.Config{WALES3Bucket: "wale-bucket"},
 			envPos: 1,
 		},
 		{
@@ -335,6 +337,7 @@ func TestCloneEnv(t *testing.T) {
 				Name:  "CLONE_WAL_S3_BUCKET",
 				Value: "wale-bucket",
 			},
+			opConfig: config.Config{WALES3Bucket: "wale-bucket"},
 			envPos: 1,
 		},
 		{
@@ -348,14 +351,28 @@ func TestCloneEnv(t *testing.T) {
 				Name:  "CLONE_TARGET_TIME",
 				Value: "somewhen",
 			},
+			opConfig: config.Config{WALES3Bucket: "wale-bucket"},
 			envPos: 4,
+		},
+		{
+			subTest: "gs",
+			cloneOpts: &acidv1.CloneDescription{
+				ClusterName:  "test-cluster",
+				EndTimestamp: "somewhen",
+				UID:          "0000",
+			},
+			env: v1.EnvVar{
+				Name:  "CLONE_WAL_GS_BUCKET",
+				Value: "walg-bucket",
+			},
+			opConfig: config.Config{WALEGSBucket: "walg-bucket"},
+			envPos: 1,
 		},
 	}
 
 	var cluster = New(
 		Config{
 			OpConfig: config.Config{
-				WALES3Bucket:   "wale-bucket",
 				ProtectedRoles: []string{"admin"},
 				Auth: config.Auth{
 					SuperUsername:       superUserName,
@@ -365,6 +382,7 @@ func TestCloneEnv(t *testing.T) {
 		}, k8sutil.KubernetesClient{}, acidv1.Postgresql{}, logger)
 
 	for _, tt := range tests {
+		cluster.OpConfig = tt.opConfig
 		envs := cluster.generateCloneEnvironment(tt.cloneOpts)
 
 		env := envs[tt.envPos]

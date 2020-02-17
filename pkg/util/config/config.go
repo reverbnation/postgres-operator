@@ -103,6 +103,7 @@ type Config struct {
 	MasterPodMoveTimeout                   time.Duration     `name:"master_pod_move_timeout" default:"20m"`
 	DbHostedZone                           string            `name:"db_hosted_zone" default:"db.example.com"`
 	AWSRegion                              string            `name:"aws_region" default:"eu-central-1"`
+	WALEGSBucket                           string            `name:"wal_gs_bucket"`
 	WALES3Bucket                           string            `name:"wal_s3_bucket"`
 	LogS3Bucket                            string            `name:"log_s3_bucket"`
 	KubeIAMRole                            string            `name:"kube_iam_role"`

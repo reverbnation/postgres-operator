@@ -95,6 +95,7 @@ func (c *Controller) importConfigurationFromCRD(fromCRD *acidv1.OperatorConfigur
 	result.ReplicaDNSNameFormat = fromCRD.LoadBalancer.ReplicaDNSNameFormat
 
 	// AWS or GCP config
+	result.WALEGSBucket = fromCRD.AWSGCP.WALEGSBucket
 	result.WALES3Bucket = fromCRD.AWSGCP.WALES3Bucket
 	result.AWSRegion = fromCRD.AWSGCP.AWSRegion
 	result.LogS3Bucket = fromCRD.AWSGCP.LogS3Bucket
