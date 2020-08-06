@@ -26,11 +26,12 @@ import (
 	"fmt"
 	"github.com/spf13/cobra"
 	"k8s.io/client-go/kubernetes"
+	_ "k8s.io/client-go/plugin/pkg/client/auth/gcp"
 	"log"
 	"strings"
 )
 
-var KubectlPgVersion string = "1.0"
+var KubectlPgVersion string = "1.1"
 
 // versionCmd represents the version command
 var versionCmd = &cobra.Command{

@@ -23,7 +23,7 @@ _testmain.go
 *.exe
 *.test
 *.prof
-/vendor/
+vendor/
 /build/
 /docker/build/
 .idea
